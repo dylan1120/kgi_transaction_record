@@ -1,0 +1,24 @@
+version: "3.9"
+
+services:
+  kgi_transaction_record:
+    image: gcr.io/tsaitung-dev/kgi_transaction_record
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    entrypoint: [ "bash" ]
+    tty: true
+    depends_on:
+      redis:
+        condition: service_healthy
+  
+  redis:
+    image: redis:6
+    ports:
+      - 127.0.0.1:6379:6379
+
+    healthcheck:
+      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
+      interval: 1s
+      timeout: 3s
+      retries: 30
